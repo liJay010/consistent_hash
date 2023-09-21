@@ -1,12 +1,10 @@
-cmake_minimum_required(VERSION 3.23)
-project(myproject)
+cmake_minimum_required(VERSION 3.0)
+project(consistent_hash)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 include_directories(.)
 
-add_executable(myproject
+add_executable(consistent_hash
         main.cpp
-        consistent_hash.cpp
-        consistent_hash.h
-        SkipList.h)
+        consistent_hash.cpp)

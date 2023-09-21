@@ -39,46 +39,34 @@ unsigned int my_getMurMurHash(const void *key, int len) {
     return h;
 }
 
-virtual_node::virtual_node() {
-    this->ip_name = "";
-    //this->hash_value = 0;
-}
-virtual_node::virtual_node(string ip_name)
-{
-    this->ip_name = ip_name;
-    //this->hash_value = my_getMurMurHash(this->ip_name.c_str(), HASH_LEN);
-}
-
-
 
 consistent_hash::consistent_hash()
 {
     real_node_sum = 0; // 真实节点数量
     virtual_node_sum = 0; //虚拟节点数量
-    this->consistent_hash_list = new SkipList<unsigned int, virtual_node *>(10);
+    this->consistent_hash_list = std::make_unique<SkipList<unsigned int, std::string>>(10);
 }
 
 
-string consistent_hash::search_by_name(string name)
+std::string consistent_hash::search_by_name(std::string name)
 {
     unsigned int s = my_getMurMurHash(name.c_str(), HASH_LEN);
-    virtual_node *v_node = this->consistent_hash_list->search_element(s);
+    std::string v_node = this->consistent_hash_list->search_element(s);
 
-    return v_node->ip_name;
+    return v_node;
 }
 
 
 //添加真实节点 -- 第二个参数为虚拟节点个数
-void consistent_hash::add_real_node(string ip, unsigned int num)
+void consistent_hash::add_real_node(std::string ip, unsigned int num)
 {
-    unordered_set<unsigned int> umap_hash;
+    std::unordered_set<unsigned int> umap_hash;
     for(unsigned int i = 0; i < num ; i++ )
     {
-        string ip_port = ip + to_string(i);
+        std::string ip_port = ip + std::to_string(i);
         unsigned int hash_value = my_getMurMurHash(ip_port.c_str(), HASH_LEN);
         umap_hash.insert(hash_value);
-        virtual_node *v_node = new virtual_node(ip);
-        consistent_hash_list->insert_element(hash_value,v_node);
+        consistent_hash_list->insert_element(hash_value,ip);
     }
     real_node_map[ip] = umap_hash;
     real_node_sum++;
@@ -87,7 +75,7 @@ void consistent_hash::add_real_node(string ip, unsigned int num)
 
 
 //删除真实节点
-void consistent_hash::drop_real_node(string ip)
+void consistent_hash::drop_real_node(std::string ip)
 {
     unsigned int val_count = 0;
     if(real_node_map.find(ip) != real_node_map.end())
@@ -115,3 +103,7 @@ void consistent_hash::print()
     std::cout << "<<<<<<<<<<<<<<<<<<<<<<<end>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
 }
 
+consistent_hash::~consistent_hash()
+{
+    
+}
